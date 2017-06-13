@@ -1,0 +1,16 @@
+include ':usbcamera'
+include ':usbCameraCommon'
+include ':libuvccamera'
+
+Properties properties = new Properties()
+try {
+    properties.load(new FileInputStream(file("local.properties")))
+}catch (Exception) {}
+
+if(findProject(":usbCameraCommon")) {
+    project(":usbCameraCommon").projectDir = file(properties.getProperty("usbccameracommon.dir"))
+}
+
+if(findProject(":libuvccamera")) {
+    project(":libuvccamera").projectDir = file(properties.getProperty("uvccamera.dir"))
+}
