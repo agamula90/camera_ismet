@@ -23,6 +23,7 @@ import com.serenegiant.usbcameracommon.UVCCameraHandler;
 import com.serenegiant.widget.CameraViewInterface;
 import com.serenegiant.usb.UVCCamera;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -127,27 +128,27 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
     }
 
     private List<RowItem> readRowItems() {
-        return Arrays.asList(
-                new RowItem(0, new String[]{"a", "b", "c", "d"}),
-                new RowItem(1, new String[]{"e", "f", "g", "h"}),
-                new RowItem(2, new String[]{"i", "j", "k", "l"}));
+        List<RowItem> rowItems = new ArrayList<>();
+        for (int i = 0; i < 30; i++) {
+            rowItems.add(new RowItem(i, new String[]{"a", "b", "c", "d"}));
+        }
+        return rowItems;
     }
-
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         mUSBMonitor.register();
         if (mUVCCameraView != null)
             mUVCCameraView.onResume();
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         mCameraHandler.close();
         if (mUVCCameraView != null)
             mUVCCameraView.onPause();
-        checkCameraButtonSilent(false);
-        super.onPause();
+        setCameraButton(false);
+        super.onStop();
     }
 
     @Override
@@ -160,10 +161,11 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
             mUSBMonitor.destroy();
             mUSBMonitor = null;
         }
+        mUVCCameraView = null;
+        mCameraButton = null;
+        mCaptureButton = null;
         super.onDestroy();
     }
-
-
 
     /**
      * event handler when click camera / capture button
@@ -199,7 +201,7 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
                         CameraDialog.showDialog(MainActivity.this);
                     } else {
                         mCameraHandler.close();
-                        checkCameraButtonSilent(false);
+                        setCameraButton(false);
                     }
                     break;
             }
@@ -225,22 +227,23 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
         }
     };
 
-
-    private void checkCameraButtonSilent(final boolean checked) {
+    private void setCameraButton(final boolean isOn) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    mCameraButton.setOnCheckedChangeListener(null);
-                    mCameraButton.setChecked(checked);
-                } finally {
-                    mCameraButton.setOnCheckedChangeListener(mOnCheckedChangeListener);
+                if (mCameraButton != null) {
+                    try {
+                        mCameraButton.setOnCheckedChangeListener(null);
+                        mCameraButton.setChecked(isOn);
+                    } finally {
+                        mCameraButton.setOnCheckedChangeListener(mOnCheckedChangeListener);
+                    }
                 }
-                if (!checked && mCaptureButton != null) {
+                if (!isOn && (mCaptureButton != null)) {
                     mCaptureButton.setVisibility(View.INVISIBLE);
                 }
             }
-        });
+        }, 0);
     }
 
     private void startPreview() {
@@ -262,14 +265,12 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 
         @Override
         public void onConnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock, final boolean createNew) {
-            Log.v(TAG, "onConnect:");
             mCameraHandler.open(ctrlBlock);
             startPreview();
         }
 
         @Override
         public void onDisconnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock) {
-            Log.v(TAG, "onDisconnect:");
             if (mCameraHandler != null) {
                 queueEvent(new Runnable() {
                     @Override
@@ -277,7 +278,7 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
                         mCameraHandler.close();
                     }
                 }, 0);
-                checkCameraButtonSilent(false);
+                setCameraButton(false);
             }
         }
         @Override
@@ -287,7 +288,7 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 
         @Override
         public void onCancel(final UsbDevice device) {
-            checkCameraButtonSilent(false);
+            setCameraButton(false);
         }
     };
 
@@ -302,9 +303,8 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 
     @Override
     public void onDialogResult(boolean canceled) {
-        Log.v(TAG, "onDialogResult:canceled=" + canceled);
         if (canceled) {
-            checkCameraButtonSilent(false);
+            setCameraButton(false);
         }
     }
 }

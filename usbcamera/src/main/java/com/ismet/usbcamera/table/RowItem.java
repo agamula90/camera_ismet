@@ -1,7 +1,7 @@
 package com.ismet.usbcamera.table;
 
 public class RowItem {
-    private final int row;
+    public final int row;
     private final String columnValues[];
 
     public RowItem(int row, String columnValues[]) {

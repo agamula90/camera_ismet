@@ -18,7 +18,7 @@ class RowViewHolder extends RecyclerView.ViewHolder {
         linearLayout = (LinearLayout) itemView;
         linearLayout.removeAllViews();
 
-        for (int i = 0; i < countColumns; i++) {
+        for (int i = 0; i < countColumns + 1; i++) {
             addDivider(context);
             TextView textView = new TextView(itemView.getContext());
             textView.setGravity(Gravity.CENTER);

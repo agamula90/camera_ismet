@@ -57,8 +57,11 @@ public class GridAdapter extends RecyclerView.Adapter<RowViewHolder> {
     public void onBindViewHolder(RowViewHolder holder, int position) {
         holder.itemView.setBackgroundColor(ContextCompat.getColor(context,
                 currentRow == position ? R.color.colorAccent : android.R.color.white));
+        RowItem rowItem = rowItems.get(position);
+
+        holder.setText(0, String.valueOf(rowItem.row));
         for (int i = 0; i < countColumns; i++) {
-            holder.setText(i, rowItems.get(position).getColumnValues()[i]);
+            holder.setText(i + 1, rowItems.get(position).getColumnValues()[i]);
         }
     }
 
