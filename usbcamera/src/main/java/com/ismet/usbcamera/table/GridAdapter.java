@@ -15,11 +15,13 @@ public class GridAdapter extends RecyclerView.Adapter<RowViewHolder> {
     private int countColumns;
     private final Context context;
     private int currentRow;
+    private final RecyclerView recyclerView;
 
-    public GridAdapter(List<RowItem> rowItems, Context context) {
+    public GridAdapter(List<RowItem> rowItems, Context context, RecyclerView recyclerView) {
         this.rowItems = rowItems;
         countColumns = rowItems.get(0).getColumnValues().length;
         this.context = context;
+        this.recyclerView = recyclerView;
         currentRow = 0;
     }
 
@@ -35,6 +37,7 @@ public class GridAdapter extends RecyclerView.Adapter<RowViewHolder> {
         currentRow++;
         currentRow = currentRow % rowItems.size();
         notifyDataSetChanged();
+        recyclerView.scrollToPosition(currentRow);
     }
 
     public void selectPrevious() {
@@ -43,6 +46,7 @@ public class GridAdapter extends RecyclerView.Adapter<RowViewHolder> {
             currentRow += rowItems.size();
         }
         notifyDataSetChanged();
+        recyclerView.scrollToPosition(currentRow);
     }
 
     public int getCurrentRow() {

@@ -94,7 +94,7 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.addItemDecoration(new DividerItemDecoration());
 
-        gridAdapter = new GridAdapter(readRowItems(), this);
+        gridAdapter = new GridAdapter(readRowItems(), this, recyclerView);
         recyclerView.setAdapter(gridAdapter);
 
         findViewById(R.id.up).setOnClickListener(new View.OnClickListener() {
